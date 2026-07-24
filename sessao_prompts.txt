@@ -137,8 +137,3 @@ Pergunta sobre como exportar a sessão filtrando apenas os prompts principais.
 ------------------------------------------------------------
 [30]
 Pedido de uma versão bem filtrada e amigável do texto, no mesmo formato exportado.
-
-------------------------------------------------------------
-[31]
-Pedido para remover linguagem inadequada, menções a tokens/credenciais e comandos
-ríspidos do texto.
