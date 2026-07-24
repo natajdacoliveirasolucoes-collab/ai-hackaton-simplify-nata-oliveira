@@ -1,0 +1,144 @@
+SESSÃO CLAUDE CODE — CRM - NATÃ (Mini-CRM Lite)
+Desafio Hackathon Simplify
+2026-07-24
+
+------------------------------------------------------------
+[01]
+Especificação do desafio (base fakestoreapi.com): corrigir bug ao trocar status do
+cliente; criar catálogo de produtos a partir da fakestoreapi; criar funções de
+adicionar/excluir clientes; persistir os dados (arquivo ou localStorage); criar
+dashboard interativo; implementar login usando a fakestoreapi. Pedido para criar o
+projeto na pasta Documents/HACKATON_SIMPLIFY_I.
+
+------------------------------------------------------------
+[02]
+Pedido para servir o projeto localmente.
+
+------------------------------------------------------------
+[03]
+Pedido para vincular o projeto ao repositório:
+https://github.com/natajdacoliveirasolucoes-collab/ai-hackaton-simplify-nata-oliveira
+
+------------------------------------------------------------
+[04]
+Pergunta se o desenvolvimento já estava concluído.
+
+------------------------------------------------------------
+[05]
+Relato de erro de login ("Usuário ou senha inválidos") e envio das credenciais de
+teste da fakestoreapi (mor_2314 / johnd).
+
+------------------------------------------------------------
+[06]
+Confirmação de que o erro de login era um engano do próprio usuário, sem necessidade
+de ajuste no código.
+
+------------------------------------------------------------
+[07]
+Pergunta sobre o que ainda faltava fazer no projeto.
+
+------------------------------------------------------------
+[08]
+Pedido para realizar o push do projeto para o repositório Git.
+
+------------------------------------------------------------
+[09]
+Pedido para configurar autenticação via chave SSH no Git, buscando mais
+independência no processo de push.
+
+------------------------------------------------------------
+[10]
+Pedido para remover o servidor local e trabalhar de forma totalmente estática.
+
+------------------------------------------------------------
+[11]
+Confirmação de que o site deveria ser estático, mesmo estando configurado
+localmente na porta 8080.
+
+------------------------------------------------------------
+[12]
+Pergunta se o uso de localStorage era compatível com a abordagem estática.
+
+------------------------------------------------------------
+[13]
+Relato de bug de redirecionamento infinito entre as telas de login e aplicação.
+
+------------------------------------------------------------
+[14]
+Pedido para consolidar o projeto em uma única página (single page).
+
+------------------------------------------------------------
+[15]
+Reforço de que o app inteiro deveria ser estático, sem servidor algum.
+
+------------------------------------------------------------
+[16]
+Pergunta sobre o funcionamento da seção de catálogo de produtos e a ideia por
+trás dela.
+
+------------------------------------------------------------
+[17]
+Pedido do link para abrir a página estática.
+
+------------------------------------------------------------
+[18]
+Relato de que, mesmo após reabrir o navegador, o login não avançava para a
+aplicação (sucesso na aba de rede, sem mudança visual na tela).
+
+------------------------------------------------------------
+[19]
+Confirmação de que não havia erro no console, com envio do resultado de comandos
+de diagnóstico (localStorage e visibilidade de elemento) solicitados.
+
+------------------------------------------------------------
+[20]
+Confirmação de que o elemento da aplicação estava com hidden = false.
+
+------------------------------------------------------------
+[21]
+Confirmação de que o conteúdo aparecia ao rolar a página, questionando por que a
+tela de login não era ocultada automaticamente.
+
+------------------------------------------------------------
+[22]
+Pedido de refactor visual do projeto e de um design melhor para o "log de ações".
+
+------------------------------------------------------------
+[23]
+Pedido para dar push após as alterações e para adicionar o nome do usuário às
+entradas do log.
+
+------------------------------------------------------------
+[24]
+Pedido para adicionar filtro na tabela de clientes, separando a seção de criação
+da seção de filtragem.
+
+------------------------------------------------------------
+[25]
+Pedido para trocar o nome do sistema para "CRM - NATÃ".
+
+------------------------------------------------------------
+[26]
+Pedido para atualizar também o título da página (tag title).
+
+------------------------------------------------------------
+[27]
+Relato de que o "log de ações" não estava sendo persistido (desaparecia ao
+atualizar a página) e pedido para persistir e, em seguida, dar push.
+
+------------------------------------------------------------
+[28]
+Pergunta se o push havia sido concluído.
+
+------------------------------------------------------------
+[29]
+Pergunta sobre como exportar a sessão filtrando apenas os prompts principais.
+
+------------------------------------------------------------
+[30]
+Pedido de uma versão bem filtrada e amigável do texto, no mesmo formato exportado.
+
+------------------------------------------------------------
+[31]
+Pedido para remover linguagem inadequada, menções a tokens/credenciais e comandos
+ríspidos do texto.
