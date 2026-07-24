@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Mini-CRM Lite — Login</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<div class="login-shell">
+  <div class="login-card">
+    <h1>Mini-CRM Lite</h1>
+    <p class="sub">Entre com uma conta da Fake Store API.</p>
+
+    <form id="form-login">
+      <div style="display:flex; flex-direction:column; gap:.7rem;">
+        <input id="username" name="username" placeholder="usuário" autocomplete="username" required />
+        <input id="password" name="password" type="password" placeholder="senha" autocomplete="current-password" required />
+        <button type="submit" id="btn-entrar">Entrar</button>
+      </div>
+      <p class="erro" id="erro"></p>
+    </form>
+
+    <div class="hint">
+      Login via <code>fakestoreapi.com/auth/login</code>. Contas de teste públicas:<br />
+      <code>mor_2314</code> / <code>83r5^_</code><br />
+      <code>johnd</code> / <code>m38rmF$</code>
+    </div>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/storage.js"></script>
+<script>
+  if (getToken()) {
+    window.location.href = "app.html";
+  }
+
+  const form = document.getElementById("form-login");
+  const erroEl = document.getElementById("erro");
+  const btn = document.getElementById("btn-entrar");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    erroEl.textContent = "";
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value;
+
+    btn.disabled = true;
+    btn.textContent = "Entrando...";
+    try {
+      const { token } = await apiLogin(username, password);
+      setSessao(token, username);
+      window.location.href = "app.html";
+    } catch (err) {
+      erroEl.textContent = err.message || "Falha no login";
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Entrar";
+    }
+  });
+</script>
+</body>
+</html>
