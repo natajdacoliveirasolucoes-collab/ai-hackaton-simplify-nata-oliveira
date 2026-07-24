@@ -3,13 +3,15 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Mini-CRM Lite — Login</title>
+<title>CRM - NATÃ</title>
 <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-<div class="login-shell">
+
+<div id="view-login" class="login-shell">
   <div class="login-card">
-    <h1>Mini-CRM Lite</h1>
+    <div class="login-mark">N</div>
+    <h1>CRM - NATÃ</h1>
     <p class="sub">Entre com uma conta da Fake Store API.</p>
 
     <form id="form-login">
@@ -29,36 +31,93 @@
   </div>
 </div>
 
+<div id="view-app" class="wrap" hidden>
+  <header class="top">
+    <h1>CRM - NATÃ</h1>
+    <p>Logado como <strong id="usuario-logado"></strong> · dados de clientes salvos neste navegador (localStorage)</p>
+  </header>
+
+  <nav class="tabs">
+    <a href="#dashboard" data-target="tab-dashboard">Dashboard</a>
+    <a href="#clientes" data-target="tab-clientes">Clientes</a>
+    <a href="#catalogo" data-target="tab-catalogo">Catálogo</a>
+    <span class="spacer"></span>
+    <span class="sair" id="btn-sair">Sair</span>
+  </nav>
+
+  <!-- DASHBOARD -->
+  <section id="tab-dashboard">
+    <div class="stat-grid" id="stat-grid"></div>
+
+    <div class="card" style="padding:1.2rem;">
+      <h2 style="font-size:.95rem; margin:0 0 1rem;">Clientes por status</h2>
+      <div id="barras-status"></div>
+    </div>
+
+    <div class="card" style="padding:1.2rem; margin-top:1rem;">
+      <h2 style="font-size:.95rem; margin:0 0 1rem;">Produtos por categoria</h2>
+      <div id="barras-categoria" class="carregando">Carregando produtos da Fake Store API...</div>
+    </div>
+  </section>
+
+  <!-- CLIENTES -->
+  <section id="tab-clientes" hidden>
+    <div class="secao-acao">
+      <h2 class="rotulo-secao">Adicionar cliente</h2>
+      <form id="form-add-cliente" class="linha bar">
+        <input id="input-nome" placeholder="Nome do cliente" required />
+        <select id="input-plano">
+          <option>Básico</option>
+          <option>Pro</option>
+          <option>Enterprise</option>
+        </select>
+        <button type="submit">Adicionar cliente</button>
+      </form>
+    </div>
+
+    <div class="secao-acao">
+      <h2 class="rotulo-secao">Filtrar clientes</h2>
+      <div class="linha bar">
+        <input id="filtro-nome" placeholder="Buscar por nome..." />
+        <select id="filtro-status">
+          <option value="">Todos os status</option>
+          <option value="ativo">Ativo</option>
+          <option value="pendente">Pendente</option>
+          <option value="inadimplente">Inadimplente</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="card">
+      <table>
+        <thead>
+          <tr><th>Nome</th><th>Plano</th><th>Status</th><th>Alterar</th><th></th></tr>
+        </thead>
+        <tbody id="tbody-clientes"></tbody>
+      </table>
+    </div>
+
+    <div class="log">
+      <h2>Log de ações</h2>
+      <div id="log" class="log-lista"></div>
+    </div>
+  </section>
+
+  <!-- CATÁLOGO -->
+  <section id="tab-catalogo" hidden>
+    <div class="bar">
+      <select id="filtro-categoria">
+        <option value="">Todas as categorias</option>
+      </select>
+    </div>
+    <div id="catalogo-grid" class="catalogo-grid">
+      <div class="carregando">Carregando produtos...</div>
+    </div>
+  </section>
+</div>
+
 <script src="js/api.js"></script>
 <script src="js/storage.js"></script>
-<script>
-  if (getToken()) {
-    window.location.href = "app.html";
-  }
-
-  const form = document.getElementById("form-login");
-  const erroEl = document.getElementById("erro");
-  const btn = document.getElementById("btn-entrar");
-
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    erroEl.textContent = "";
-    const username = document.getElementById("username").value.trim();
-    const password = document.getElementById("password").value;
-
-    btn.disabled = true;
-    btn.textContent = "Entrando...";
-    try {
-      const { token } = await apiLogin(username, password);
-      setSessao(token, username);
-      window.location.href = "app.html";
-    } catch (err) {
-      erroEl.textContent = err.message || "Falha no login";
-    } finally {
-      btn.disabled = false;
-      btn.textContent = "Entrar";
-    }
-  });
-</script>
+<script src="js/app.js"></script>
 </body>
 </html>

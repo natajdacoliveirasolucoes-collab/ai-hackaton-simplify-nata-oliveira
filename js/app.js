@@ -1,12 +1,46 @@
-// Guard: sem token, volta pro login
-if (!getToken()) {
-  window.location.href = "index.html";
+// ---------- Login / logout (troca de view, sem navegação de página) ----------
+function mostrarLogin() {
+  document.getElementById("view-app").hidden = true;
+  document.getElementById("view-login").hidden = false;
 }
 
-document.getElementById("usuario-logado").textContent = getUsername() || "usuário";
+function mostrarApp() {
+  document.getElementById("view-login").hidden = true;
+  document.getElementById("view-app").hidden = false;
+  document.getElementById("usuario-logado").textContent = getUsername() || "usuário";
+  renderClientes();
+  carregarLog();
+  mostrarAba("tab-dashboard");
+}
+
 document.getElementById("btn-sair").addEventListener("click", () => {
   limparSessao();
-  window.location.href = "index.html";
+  mostrarLogin();
+});
+
+const formLogin = document.getElementById("form-login");
+const erroEl = document.getElementById("erro");
+const btnEntrar = document.getElementById("btn-entrar");
+
+formLogin.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  erroEl.textContent = "";
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value;
+
+  btnEntrar.disabled = true;
+  btnEntrar.textContent = "Entrando...";
+  try {
+    const { token } = await apiLogin(username, password);
+    setSessao(token, username);
+    mostrarApp();
+  } catch (err) {
+    console.error("Falha no login:", err);
+    erroEl.textContent = err.message || "Falha no login";
+  } finally {
+    btnEntrar.disabled = false;
+    btnEntrar.textContent = "Entrar";
+  }
 });
 
 const STATUS = ["ativo", "pendente", "inadimplente"];
@@ -31,11 +65,29 @@ links.forEach((l) => {
 });
 
 // ---------- Clientes (CRM) ----------
+function clientesFiltrados() {
+  const nomeFiltro = document.getElementById("filtro-nome").value.trim().toLowerCase();
+  const statusFiltro = document.getElementById("filtro-status").value;
+
+  return clientes.filter((c) => {
+    const bateNome = !nomeFiltro || c.nome.toLowerCase().includes(nomeFiltro);
+    const bateStatus = !statusFiltro || c.status.valor === statusFiltro;
+    return bateNome && bateStatus;
+  });
+}
+
 function renderClientes() {
   const tbody = document.getElementById("tbody-clientes");
   tbody.innerHTML = "";
 
-  for (const c of clientes) {
+  const listaVisivel = clientesFiltrados();
+
+  if (listaVisivel.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5" class="vazio-estado">Nenhum cliente encontrado.</td></tr>`;
+    return;
+  }
+
+  for (const c of listaVisivel) {
     const tr = document.createElement("tr");
     const icone = c.status.valor === "inadimplente" ? "⚠ " : "";
     const options = STATUS.map(
@@ -53,14 +105,45 @@ function renderClientes() {
   }
 }
 
-function registrarLog(texto, alerta = false) {
-  const box = document.getElementById("log");
-  const vazio = box.querySelector(".vazio");
+const ICONE_LOG = { add: "+", del: "✕", status: "↻", alerta: "!" };
+
+function renderLogItem(entrada) {
+  const item = document.createElement("div");
+  item.className = `log-item ${entrada.tipo}`;
+  item.innerHTML = `
+    <span class="icone">${ICONE_LOG[entrada.tipo] || "•"}</span>
+    <span class="conteudo">
+      <span class="msg">${escapeHtml(entrada.mensagem)}</span>
+      <span class="meta">${escapeHtml(entrada.usuario || "usuário")} · ${entrada.quando}</span>
+    </span>
+  `;
+  return item;
+}
+
+function registrarLog(tipo, mensagem, quando) {
+  const entrada = {
+    tipo,
+    mensagem,
+    quando: quando || new Date().toLocaleTimeString("pt-BR"),
+    usuario: getUsername() || "usuário",
+  };
+  addLogEntrada(entrada);
+
+  const lista = document.getElementById("log");
+  const vazio = lista.querySelector(".log-vazio");
   if (vazio) vazio.remove();
-  const linha = document.createElement("div");
-  linha.className = "linha" + (alerta ? " alerta" : "");
-  linha.textContent = "› " + texto;
-  box.prepend(linha);
+  lista.prepend(renderLogItem(entrada));
+}
+
+function carregarLog() {
+  const lista = document.getElementById("log");
+  const entradas = getLogEntradas();
+  if (entradas.length === 0) {
+    lista.innerHTML = '<div class="log-vazio">Nenhuma ação ainda.</div>';
+    return;
+  }
+  lista.innerHTML = "";
+  entradas.forEach((entrada) => lista.appendChild(renderLogItem(entrada)));
 }
 
 document.getElementById("tbody-clientes").addEventListener("change", (e) => {
@@ -70,9 +153,9 @@ document.getElementById("tbody-clientes").addEventListener("change", (e) => {
   clientes = updateStatusCliente(clientes, id, novoValor);
   const cliente = clientes.find((c) => c.id === id);
   if (novoValor === "inadimplente") {
-    registrarLog(`⚠ Ação disparada: ${cliente.nome} ficou INADIMPLENTE (${cliente.status.atualizadoEm})`, true);
+    registrarLog("alerta", `Ação disparada: ${cliente.nome} ficou INADIMPLENTE`, cliente.status.atualizadoEm);
   } else {
-    registrarLog(`${cliente.nome} → ${ROTULO_STATUS[novoValor]} (${cliente.status.atualizadoEm})`);
+    registrarLog("status", `${cliente.nome} → ${ROTULO_STATUS[novoValor]}`, cliente.status.atualizadoEm);
   }
   renderClientes();
 });
@@ -84,7 +167,7 @@ document.getElementById("tbody-clientes").addEventListener("click", (e) => {
   if (!cliente) return;
   if (!confirm(`Excluir o cliente "${cliente.nome}"?`)) return;
   clientes = deleteCliente(clientes, id);
-  registrarLog(`Cliente removido: ${cliente.nome}`);
+  registrarLog("del", `Cliente removido: ${cliente.nome}`);
   renderClientes();
 });
 
@@ -95,10 +178,13 @@ document.getElementById("form-add-cliente").addEventListener("submit", (e) => {
   const plano = document.getElementById("input-plano").value;
   if (!nome) return;
   clientes = addCliente(clientes, { nome, plano });
-  registrarLog(`Cliente adicionado: ${nome} (${plano})`);
+  registrarLog("add", `Cliente adicionado: ${nome} (${plano})`);
   nomeInput.value = "";
   renderClientes();
 });
+
+document.getElementById("filtro-nome").addEventListener("input", renderClientes);
+document.getElementById("filtro-status").addEventListener("change", renderClientes);
 
 function escapeHtml(str) {
   const div = document.createElement("div");
@@ -153,8 +239,8 @@ async function renderCatalogo() {
 document.getElementById("filtro-categoria").addEventListener("change", renderCatalogo);
 
 // ---------- Dashboard ----------
-function statCard(valor, rotulo) {
-  return `<div class="stat-card"><div class="valor">${valor}</div><div class="rotulo">${rotulo}</div></div>`;
+function statCard(valor, rotulo, modificador = "") {
+  return `<div class="stat-card ${modificador}"><div class="valor">${valor}</div><div class="rotulo">${rotulo}</div></div>`;
 }
 
 function barraStatus(rotulo, qtd, total, cor) {
@@ -173,9 +259,9 @@ async function renderDashboard() {
 
   document.getElementById("stat-grid").innerHTML =
     statCard(total, "Clientes") +
-    statCard(porStatus.ativo, "Ativos") +
-    statCard(porStatus.pendente, "Pendentes") +
-    statCard(porStatus.inadimplente, "Inadimplentes");
+    statCard(porStatus.ativo, "Ativos", "ativos") +
+    statCard(porStatus.pendente, "Pendentes", "pendentes") +
+    statCard(porStatus.inadimplente, "Inadimplentes", "inadimplentes");
 
   document.getElementById("barras-status").innerHTML =
     barraStatus("Ativo", porStatus.ativo, total, "#157347") +
@@ -197,6 +283,8 @@ async function renderDashboard() {
 }
 
 // ---------- Início ----------
-document.getElementById("log").innerHTML = '<span class="vazio">Nenhuma ação ainda.</span>';
-renderClientes();
-mostrarAba("tab-dashboard");
+if (getToken()) {
+  mostrarApp();
+} else {
+  mostrarLogin();
+}

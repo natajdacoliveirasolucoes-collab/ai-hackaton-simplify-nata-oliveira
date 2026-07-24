@@ -4,7 +4,10 @@ const STORAGE_KEYS = {
   CLIENTES: "crm_clientes",
   TOKEN: "crm_token",
   USERNAME: "crm_username",
+  LOG: "crm_log",
 };
+
+const LOG_MAX_ENTRADAS = 200;
 
 // Clientes iniciais (seed) — usados só na primeira execução.
 // Cada cliente recebe seu PRÓPRIO objeto de status (bug original: os 3
@@ -66,6 +69,24 @@ function updateStatusCliente(clientes, id, novoValor) {
   );
   saveClientes(atualizados);
   return atualizados;
+}
+
+// --- Log de ações ---
+
+function getLogEntradas() {
+  const raw = localStorage.getItem(STORAGE_KEYS.LOG);
+  if (!raw) return [];
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return [];
+  }
+}
+
+function addLogEntrada(entrada) {
+  const entradas = [entrada, ...getLogEntradas()].slice(0, LOG_MAX_ENTRADAS);
+  localStorage.setItem(STORAGE_KEYS.LOG, JSON.stringify(entradas));
+  return entradas;
 }
 
 // --- Sessão (login) ---
